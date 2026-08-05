@@ -17,9 +17,10 @@ rebuilding.
 
 **[▶ Demo video + writeup on r/homeassistant](https://www.reddit.com/r/homeassistant/comments/1vfrrag/sanytron_ha100_remote_working_flawlessly/)** — see it running on the actual remote.
 
-> **There is no prebuilt download.** You build the APK yourself — about 10 minutes once the
-> toolchain is installed, and you have to edit the config with your own Home Assistant details
-> anyway. Start at [docs/SETUP.md](docs/SETUP.md).
+> **Quick start:** grab the APK from [Releases](../../releases), sideload it, then push a
+> config with your own Home Assistant details — no build toolchain needed, just ADB. Full
+> steps in [docs/SETUP.md](docs/SETUP.md#quick-start-prebuilt-apk). Building from source is
+> still supported and required if you want to change behaviour rather than layout.
 
 ---
 

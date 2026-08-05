@@ -2,7 +2,47 @@
 
 From a factory remote to a working dashboard. Budget an hour the first time.
 
+There are two routes. **Start with the prebuilt APK** unless you intend to change the app's
+behaviour — the config file controls pages, cards, entities, dots, colours and the button map
+without any building at all.
+
 ---
+
+## Quick start (prebuilt APK)
+
+You need only **ADB** and a text editor — no JDK, no Android SDK.
+
+1. Download the latest APK from [Releases](../../releases).
+2. Enable USB debugging on the remote (section 2 below) and connect it.
+3. Install, and grant the permissions the app can't grant itself:
+
+```bash
+adb install -r astrion-remote-v0.2.0.apk
+```
+
+4. Launch it once. It will start, fail to reach Home Assistant, and show a connection error —
+   that is expected, because it still has placeholder settings.
+5. Copy [`app/src/main/res/raw/default_dashboard.json`](../app/src/main/res/raw/default_dashboard.json)
+   from this repo, replace every `YOUR_*` placeholder with your own values (see
+   [CONFIG.md](CONFIG.md)), and push it:
+
+```bash
+adb push dashboard.json /sdcard/astrion/dashboard.json
+```
+
+6. Reopen the app. It connects. Continue at section 5 for the permission commands and
+   section 6 to make it the launcher.
+
+The APKs are signed with a self-signed key, so Android will warn about installing from an
+unknown source — that is normal for sideloaded apps and unavoidable outside the Play Store.
+Every release is signed with the **same** key, so updates install over each other without
+losing your config.
+
+---
+
+## Building from source
+
+Required only if you want to change app behaviour or add card types.
 
 ## 0. What you need
 

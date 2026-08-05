@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,9 +7,30 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+// Release signing details live in local.properties, which is never committed. If they are
+// absent — i.e. anyone who just cloned this repo — the release build falls back to the debug
+// key, so `./gradlew assembleRelease` still works out of the box. Only the published APKs
+// need the real key, so that updates install over each other instead of forcing a reinstall.
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val releaseStorePath: String? = localProps.getProperty("RELEASE_STORE_FILE")
+
 android {
     namespace = "com.astrion.remote"
     compileSdk = 34
+
+    signingConfigs {
+        if (releaseStorePath != null && file(releaseStorePath).exists()) {
+            create("release") {
+                storeFile = file(releaseStorePath)
+                storePassword = localProps.getProperty("RELEASE_STORE_PASSWORD")
+                keyAlias = localProps.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = localProps.getProperty("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.astrion.remote"
@@ -20,11 +43,11 @@ android {
     buildTypes {
         release {
             // Optimized build for the low-end Astrion hardware: R8 strips and optimizes
-            // code, resource shrinking drops unused assets. Signed with the debug key so
-            // plain `adb install -r` keeps working (no Play Store, sideload only).
+            // code, resource shrinking drops unused assets. Sideload only — no Play Store —
+            // so a self-signed key is fine; see the signingConfigs block above.
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
