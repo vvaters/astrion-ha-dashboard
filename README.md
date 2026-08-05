@@ -17,6 +17,10 @@ rebuilding.
 
 **[▶ Demo video + writeup on r/homeassistant](https://www.reddit.com/r/homeassistant/comments/1vfrrag/sanytron_ha100_remote_working_flawlessly/)** — see it running on the actual remote.
 
+> **There is no prebuilt download.** You build the APK yourself — about 10 minutes once the
+> toolchain is installed, and you have to edit the config with your own Home Assistant details
+> anyway. Start at [docs/SETUP.md](docs/SETUP.md).
+
 ---
 
 ## What it does
@@ -24,7 +28,7 @@ rebuilding.
 | | |
 |---|---|
 | **Live HA connection** | One WebSocket: auth → `get_states` → `subscribe_events`. Auto-reconnects with backoff. ~450 entities tracked without lag. |
-| **Swipeable pages** | Any number, defined in config. The stock app hardcodes 11 card types; here you compose your own. |
+| **Swipeable pages** | Any number, defined in config. Instead of a fixed set of vendor-defined cards, you compose your own. |
 | **Tappable floorplan** | Drop a floorplan image in, place dots by percentage coordinates, tap to toggle. Dots recolor live with state. |
 | **Physical buttons** | Every hardware key mapped to HA services, IR blasts, page jumps, or device actions. Tap and long-press are separate. |
 | **Voice** | Tap-to-talk into HA Assist (works with a local LLM). Client-side silence detection ends the recording. |
@@ -102,6 +106,24 @@ device on a home LAN, but you should know what it means:
 - If a token leaks, revoke it in HA (Profile → Security → Long-lived access tokens).
 
 The same applies to the optional Plex token.
+
+### Why it asks for scary permissions
+
+This app requests three permissions that would be alarming in a normal app. Each is granted
+manually over ADB — none can be enabled silently, and the app works (with the noted losses)
+if you skip them:
+
+| Permission | Why | Skip it and… |
+|---|---|---|
+| **Accessibility service** | The firmware's pull-down shortcut launches the vendor app over the dashboard. The service detects that and bounces back, and rescues the Home button. | The vendor app hijacks the screen and you have to swipe back manually. |
+| **Device admin** | The only API that lets an app turn the screen off, used for hold-power-to-sleep. | Hold-power-to-sleep does nothing; the screen sleeps on its own timeout. |
+| **`WRITE_SECURE_SETTINGS`** | Re-enables the accessibility binding this firmware randomly drops, and keeps the firmware's hair-trigger wake gestures off. | You re-run two ADB commands by hand whenever the binding drops. |
+
+No network destination other than your Home Assistant instance (and your Plex server, if you
+configure the Plex card). Nothing is sent anywhere else — read
+[`HaClient.kt`](app/src/main/java/com/astrion/remote/ha/HaClient.kt) and
+[`BatteryReporter.kt`](app/src/main/java/com/astrion/remote/ha/BatteryReporter.kt) if you want
+to confirm that yourself.
 
 ---
 
