@@ -1,0 +1,390 @@
+{
+  "_comment": [
+    "Astrion HA Dashboard - EXAMPLE CONFIG. Replace every YOUR_* placeholder.",
+    "Docs: docs/CONFIG.md (every card + option) and docs/IR-CODES.md (the hotkey codes).",
+    "This file is baked into the APK and copied to /sdcard/astrion/dashboard.json on",
+    "first launch. After that, edit the sdcard copy and reopen the app - no rebuild:",
+    "  adb push dashboard.json /sdcard/astrion/dashboard.json"
+  ],
+  "ha": {
+    "host": "http://YOUR_HA_HOST:8123",
+    "token": "YOUR_LONG_LIVED_ACCESS_TOKEN"
+  },
+  "startPage": 1,
+  "pages": [
+    {
+      "name": "Lights",
+      "cards": [
+        {
+          "type": "bubble_light",
+          "options": {
+            "entity_id": "light.living_room",
+            "name": "Living Room"
+          }
+        },
+        {
+          "type": "bubble_light",
+          "options": {
+            "entity_id": "light.floor_lamp",
+            "name": "Floor Lamp"
+          }
+        },
+        {
+          "type": "bubble_light",
+          "options": {
+            "entity_id": "light.table_lamp",
+            "name": "Table Lamp"
+          }
+        },
+        {
+          "type": "bubble_light",
+          "options": {
+            "entities": [
+              "light.tv_backlight_left",
+              "light.tv_backlight_right"
+            ],
+            "name": "TV Backlight"
+          }
+        },
+        {
+          "type": "scene_grid",
+          "options": {
+            "layout": "row",
+            "scenes": [
+              {
+                "entity_id": "scene.relax",
+                "name": "Relax",
+                "color": "#663F51B5"
+              },
+              {
+                "entity_id": "scene.bright",
+                "name": "Bright",
+                "color": "#66009688"
+              },
+              {
+                "entity_id": "scene.dimmed",
+                "name": "Dimmed",
+                "color": "#665C6BC0"
+              },
+              {
+                "entity_id": "scene.movie",
+                "name": "Movie",
+                "color": "#66795548"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Main",
+      "showTitle": false,
+      "cards": [
+        {
+          "type": "clock_weather",
+          "variant": "compact",
+          "options": {
+            "entity_id": "weather.forecast_home"
+          }
+        },
+        {
+          "type": "picture_elements",
+          "options": {
+            "image": "/sdcard/astrion/floorplan.png",
+            "elements": [
+              {
+                "entity_id": "light.tv_backlight_left",
+                "x": 26,
+                "y": 16
+              },
+              {
+                "entity_id": "light.floor_lamp",
+                "x": 14,
+                "y": 32
+              },
+              {
+                "entity_id": "light.table_lamp",
+                "x": 27,
+                "y": 73
+              },
+              {
+                "entity_id": "switch.kitchen_lights",
+                "x": 84,
+                "y": 16
+              },
+              {
+                "entity_id": "light.dining_pendant",
+                "x": 83,
+                "y": 64
+              },
+              {
+                "entity_id": "switch.entry_light",
+                "x": 59,
+                "y": 88
+              },
+              {
+                "entity_id": "switch.espresso_machine",
+                "icon_name": "coffee",
+                "x": 93,
+                "y": 16
+              },
+              {
+                "entities": [
+                  "light.tv_backlight_left",
+                  "light.tv_backlight_right",
+                  "light.floor_lamp",
+                  "light.table_lamp",
+                  "light.dining_pendant",
+                  "switch.kitchen_lights",
+                  "switch.entry_light"
+                ],
+                "icon_name": "lights",
+                "x": 50,
+                "y": 45
+              }
+            ],
+            "all_off": false,
+            "full_bleed": true
+          }
+        },
+        {
+          "type": "button_grid",
+          "options": {
+            "buttons": [
+              {
+                "name": "Media",
+                "icon": "/sdcard/astrion/icons/plex.png",
+                "service": "script.turn_on",
+                "entity_id": "script.YOUR_LAUNCH_SCRIPT"
+              },
+              {
+                "name": "Relax",
+                "icon_name": "spa",
+                "service": "scene.turn_on",
+                "entity_id": "scene.relax"
+              },
+              {
+                "name": "Movie",
+                "icon_name": "tv",
+                "service": "scene.turn_on",
+                "entity_id": "scene.movie"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "scroll": false,
+      "showTitle": false,
+      "cards": [
+        {
+          "type": "plex",
+          "options": {
+            "host": "http://YOUR_PLEX_HOST:32400",
+            "token": "YOUR_X_PLEX_TOKEN",
+            "play_entity": "media_player.YOUR_PLEX_CLIENT",
+            "media_entity": "media_player.YOUR_TV",
+            "source": "Plex"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Climate",
+      "scroll": false,
+      "showTitle": false,
+      "cards": [
+        {
+          "type": "climate",
+          "options": {
+            "entity_id": "climate.thermostat",
+            "name": "Thermostat"
+          }
+        }
+      ]
+    }
+  ],
+  "hotkeys": [
+    {
+      "key": "UP",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,560,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,1690,560"
+      }
+    },
+    {
+      "key": "DOWN",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,560,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,1690,560"
+      }
+    },
+    {
+      "key": "LEFT",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "RIGHT",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,560,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "CENTER",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,1690,560,560,560,560,560,560,560,1690,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,560,560,1690,560"
+      }
+    },
+    {
+      "key": "BACK",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,1690,560,560,560,1690,560,560,560,560,560,1690,560,1690,560,1690,560,560,560,1690,560,560,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "HOME",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560"
+      }
+    },
+    {
+      "key": "POWER",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,1690,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "VOLUME_UP",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,560,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "VOLUME_DOWN",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "MUTE",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "PAGE_UP",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "PAGE_DOWN",
+      "service": "remote.send_command",
+      "entityId": "remote.YOUR_IR_REMOTE_ENTITY",
+      "data": {
+        "command": "38000,9000,4500,560,560,560,560,560,1690,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560,1690,560"
+      }
+    },
+    {
+      "key": "LIGHT",
+      "page": "Lights"
+    },
+    {
+      "key": "CURTAIN",
+      "page": "Climate"
+    },
+    {
+      "key": "SCENE",
+      "page": "Media"
+    },
+    {
+      "key": "AC",
+      "page": "Climate"
+    },
+    {
+      "key": "CUSTOM_1",
+      "page": "Main"
+    },
+    {
+      "key": "CUSTOM_2",
+      "service": "script.turn_on",
+      "entityId": "script.YOUR_LAUNCH_SCRIPT"
+    }
+  ],
+  "longHotkeys": [
+    {
+      "key": "POWER",
+      "device": "sleep"
+    },
+    {
+      "key": "PAGE_UP",
+      "service": "cover.open_cover",
+      "entityId": "cover.YOUR_BLINDS"
+    },
+    {
+      "key": "PAGE_DOWN",
+      "service": "cover.close_cover",
+      "entityId": "cover.YOUR_BLINDS"
+    },
+    {
+      "key": "CUSTOM_1",
+      "service": "scene.turn_on",
+      "entityId": "scene.relax"
+    },
+    {
+      "key": "CUSTOM_2",
+      "service": "scene.turn_on",
+      "entityId": "scene.movie"
+    },
+    {
+      "key": "CUSTOM_3",
+      "service": "scene.turn_on",
+      "entityId": "scene.bright"
+    },
+    {
+      "key": "CUSTOM_4",
+      "service": "scene.turn_on",
+      "entityId": "scene.dimmed"
+    }
+  ],
+  "keymap": {
+    "131": "HOME",
+    "132": "POWER",
+    "133": "VOICE",
+    "82": "SETTINGS",
+    "134": "LIGHT",
+    "135": "CURTAIN",
+    "136": "SCENE",
+    "137": "AC",
+    "138": "CUSTOM_1",
+    "139": "CUSTOM_3",
+    "140": "CUSTOM_4",
+    "141": "CUSTOM_2"
+  }
+}

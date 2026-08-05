@@ -1,0 +1,29 @@
+# Build outputs
+build/
+app/build/
+.gradle/
+.kotlin/
+
+# Local machine config (SDK path)
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# --- Secrets: never commit these -------------------------------------------
+# Built APKs embed your Home Assistant token in plain text.
+*.apk
+*.aab
+# A working config with a real token pasted in. The tracked copy at
+# app/src/main/res/raw/default_dashboard.json must stay placeholder-only.
+dashboard.json
+*.local.json
+secrets.yaml

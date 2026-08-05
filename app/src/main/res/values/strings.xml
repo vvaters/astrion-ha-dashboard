@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Astrion Remote</string>
+    <string name="rescue_service_description">Makes the physical Home button return to the Astrion dashboard from any app.</string>
+</resources>
