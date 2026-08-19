@@ -173,10 +173,23 @@ how strict `PickupWakeService` is. It is invisible from the UI and survives ever
 except editing the preference directly. **Requires root:**
 
 ```bash
-adb shell "su 0 cp /data/data/com.aiks.HaRemote/shared_prefs/DisplaySettings.xml /data/data/com.aiks.HaRemote/shared_prefs/DisplaySettings.xml.bak"
+PREF=/data/data/com.aiks.HaRemote/shared_prefs/DisplaySettings.xml
+adb shell "su 0 cp $PREF $PREF.bak"
 adb shell am force-stop com.aiks.HaRemote
-adb shell "su 0 sed -i 's/name=\"wakeup_enabled\" value=\"true\"/name=\"wakeup_enabled\" value=\"false\"/' /data/data/com.aiks.HaRemote/shared_prefs/DisplaySettings.xml"
+adb shell "su 0 sed -i 's/name=\"wakeup_enabled\" value=\"true\"/name=\"wakeup_enabled\" value=\"false\"/' $PREF"
 ```
+
+**Editing the file is not enough — the app writes the setting back.** It reverted here within
+hours. Lock the file read-only so it cannot (`chattr` is absent on this build, so use mode
+bits):
+
+```bash
+adb shell "su 0 chown root:root $PREF; su 0 chmod 444 $PREF"
+```
+
+Verified to survive a full vendor-app restart with IR still working. It is not absolutely
+bulletproof — the app owns the directory, so it could in principle delete and recreate the
+file — so re-check the value if phantom wakes ever return.
 
 Restart the vendor app afterwards (`adb shell cmd package resolve-activity --brief
 com.aiks.HaRemote` gives the launcher activity) — it is the IR driver and must keep running.
