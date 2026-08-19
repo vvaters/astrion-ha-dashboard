@@ -42,13 +42,19 @@ adb connect 192.168.1.50:5555
 From then on every `adb install`, `adb push`, and `adb shell screencap` works wirelessly —
 no screws.
 
-**Two honest limitations:**
+**Making it permanent (rooted units only).** Some HA100 units ship with `su` available —
+check with `adb shell "su 0 id"`. If that returns `uid=0(root)`, one property makes wireless
+ADB survive reboots for good:
 
-- **It does not survive a reboot.** `adb tcpip` restarts the ADB daemon in TCP mode, and a
-  reboot puts it back to USB-only. Making it permanent requires setting a system property
-  that needs root, which this device does not have out of the box. In practice you get
-  wireless access until the next reboot — which is usually plenty, since the app itself is
-  what you're iterating on.
+```bash
+adb shell "su 0 setprop persist.adb.tcp.port 5555"
+```
+
+**One honest limitation:**
+
+- **Without root it does not survive a reboot.** `adb tcpip` restarts the ADB daemon in TCP
+  mode, and a reboot puts it back to USB-only. In practice you still get wireless access
+  until the next reboot — usually plenty, since the app is what you're iterating on.
 - **Both machines must be able to reach each other on the network.** If your laptop is on a
   different subnet from the remote (common when a router hands out `192.168.1.x` while your
   IoT gear sits on `192.168.86.x`), `adb connect` will simply time out. Check with
@@ -120,8 +126,7 @@ A firmware shortcut that yanks you out of the dashboard. `KeyRescueService` boun
 the stock app on purpose.
 
 ### 4. The firmware has its own hair-trigger wake gestures
-Hidden kernel-level motion wake — wakes log as `reason=rmt:screen`. On a couch it turns the
-screen on constantly, draining the battery.
+Hidden kernel-level motion wake, enabled by default and invisible in the UI. Turn both off:
 
 ```bash
 adb shell settings put secure wake_gesture_enabled 0
@@ -131,6 +136,9 @@ adb shell settings put secure double_tap_to_wake 0
 The app re-applies these every 60 seconds, because a reboot can bring them back. Our own
 pickup detection (`PickupWakeService`) requires *sustained* motion plus a real tilt, so it
 doesn't fire on cushion wobble.
+
+If the screen still wakes on its own after this, the cause is the vendor app rather than the
+firmware — see gotcha 11, which is the one that actually fixed it here.
 
 ### 5. Physical d-pad presses used to scroll the page
 Android's keyboard-navigation mode was focusing cards and stealing the d-pad.
@@ -155,6 +163,37 @@ endpoint (Shield, Apple TV) behaves correctly.
 ### 10. Mic buttons may emit instant press+release
 On this device the voice button sends press and release together, so hold-to-talk is
 impossible. Hence tap-to-talk with client-side silence detection.
+
+### 11. The vendor app runs its own pickup-wake — and it overrides yours
+`com.aiks.HaRemote` runs as the **system user**, so its wakes log as
+`uid=1000 reason=rmt:screen`. It has a private preference enabling its own accelerometer
+pickup-wake, and it is far more trigger-happy than anything in this app: with it on, the
+screen turns on constantly while the remote sits untouched on a table or couch, no matter
+how strict `PickupWakeService` is. It is invisible from the UI and survives everything
+except editing the preference directly. **Requires root:**
+
+```bash
+adb shell "su 0 cp /data/data/com.aiks.HaRemote/shared_prefs/DisplaySettings.xml /data/data/com.aiks.HaRemote/shared_prefs/DisplaySettings.xml.bak"
+adb shell am force-stop com.aiks.HaRemote
+adb shell "su 0 sed -i 's/name=\"wakeup_enabled\" value=\"true\"/name=\"wakeup_enabled\" value=\"false\"/' /data/data/com.aiks.HaRemote/shared_prefs/DisplaySettings.xml"
+```
+
+Restart the vendor app afterwards (`adb shell cmd package resolve-activity --brief
+com.aiks.HaRemote` gives the launcher activity) — it is the IR driver and must keep running.
+
+Confirm the fix by leaving the device asleep and untouched for ten minutes:
+
+```bash
+adb logcat -d -b all | grep "Waking up from sleep"
+```
+
+Anything reading `reason=rmt:screen` is the vendor app. Wakes from this app read
+`reason=astrion:pickupWake`; the power button reads `android.policy:POWER`.
+
+The same app also registers an `RTC_WAKEUP` alarm, `ACTION_DAILY_UPDATE_CHECK`, which phones
+home to the vendor. It re-registers on launch and has no off switch, but in testing it only
+turned the screen on when it actually found an update. Note that this app also caches your
+Home Assistant configuration and credentials locally.
 
 ---
 
