@@ -1,6 +1,6 @@
 # Astrion HA Dashboard
 
-A native Android dashboard "smart home remotes" — built for the
+A native Android dashboard for the "smart home remote" tablets sold under many names — built for the
 **Sanytron Astrion HA100** — that talks **directly to Home Assistant over one WebSocket**.
 It replaces the stock vendor app entirely.
 
