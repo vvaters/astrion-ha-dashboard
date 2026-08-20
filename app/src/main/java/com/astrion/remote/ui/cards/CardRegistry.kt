@@ -32,6 +32,7 @@ fun CardRenderer(card: CardConfig, entities: Map<String, EntityState>, haClient:
         "picture_elements" -> PictureElementsCard(card, entities, haClient)
         "button_grid" -> ButtonGridCard(card, haClient)
         "plex" -> PlexCard(card, entities, haClient)
+        "separator" -> SeparatorCard(card)
         else -> UnknownCard(card, entity)
     }
 }
